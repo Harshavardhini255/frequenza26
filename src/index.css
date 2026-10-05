@@ -1,0 +1,867 @@
+﻿@import "tailwindcss";
+
+/* ══════════════════════════════════════════════════════════════════════════
+   FREQUENZA '26 — ELECTRONICS / ECE / FREQUENCY DESIGN SYSTEM
+   Deep navy-black substrate · electric cyan signal · subtle violet ambient
+   ══════════════════════════════════════════════════════════════════════════ */
+
+@theme {
+  /* ── Typography ───────────────────────────────────────────────────────── */
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Chakra Petch", "Inter", system-ui, sans-serif;
+  --font-poster: "Bebas Neue", "Chakra Petch", "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  /* ── Substrate ────────────────────────────────────────────────────────── */
+  --color-void: #04060c;
+  --color-ink: #060a12;
+  --color-graphite: #0a1018;
+  --color-panel: #0b1220;
+  --color-panel-2: #0e1726;
+  --color-edge: #16233a;
+
+  /* ── Signal (electric cyan) ───────────────────────────────────────────── */
+  --color-signal-100: #d7f7ff;
+  --color-signal-200: #a8ecfd;
+  --color-signal-300: #5fdcf8;
+  --color-signal-400: #22c8ec;
+  --color-signal-500: #0aa5cc;
+  --color-signal-600: #0a7f9e;
+
+  /* ── Ion (electric blue) ──────────────────────────────────────────────── */
+  --color-ion-300: #93b8ff;
+  --color-ion-400: #5b8dfb;
+  --color-ion-500: #2f63e0;
+
+  /* ── Plasma (subtle violet) ───────────────────────────────────────────── */
+  --color-plasma-300: #c4b5fd;
+  --color-plasma-400: #9d7cf7;
+  --color-plasma-500: #7c4ded;
+
+  /* ── Semantic (functional status colours — unchanged) ─────────────────── */
+  --color-status-ok: #34d399;
+  --color-status-warn: #fbbf24;
+  --color-status-bad: #f87171;
+
+  --color-hairline: #ffffff0f;
+
+  /* ── Legacy palette aliases ──────────────────────────────────────────────
+     The registration, payment-status and admin pages still reference the old
+     token names. Mapping them into the signal ramp means every existing
+     utility (including `/opacity` modifiers such as `border-gold-500/30`)
+     resolves to the new electronics theme, so none of that working
+     functionality had to be rewritten. */
+  --color-gold-300: #a8ecfd;
+  --color-gold-400: #5fdcf8;
+  --color-gold-500: #22c8ec;
+  --color-gold-600: #0aa5cc;
+  --color-dark-bg: #04060c;
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-void);
+    color: #e2e8f0;
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  /* Kill horizontal scroll from decorative / absolutely positioned layers */
+  #root {
+    overflow-x: clip;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
+    font-family: var(--font-display);
+    letter-spacing: 0.005em;
+  }
+
+  ::selection {
+    background: rgba(34, 200, 236, 0.28);
+    color: #ecfeff;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-void);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #14304a;
+    border-radius: 6px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-signal-500);
+  }
+
+  input,
+  select,
+  textarea {
+    transition:
+      border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+      background-color 0.25s;
+  }
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+    outline: none;
+    border-color: rgba(34, 200, 236, 0.6);
+    box-shadow: 0 0 0 3px rgba(34, 200, 236, 0.12);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-signal-400);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  /* ── Cinematic section rhythm ──────────────────────────────────────────
+     Generous, viewport-relative vertical spacing is what makes each band
+     feel like a "shot" instead of a stack of boxes. */
+  .section-y {
+    padding-top: clamp(4.5rem, 9vw, 8rem);
+    padding-bottom: clamp(2.5rem, 5vw, 4.5rem);
+  }
+
+  .section-y-lg {
+    padding-top: clamp(5.5rem, 11vw, 10rem);
+    padding-bottom: clamp(3rem, 6vw, 5.5rem);
+  }
+
+  /* ── Glass surfaces ──────────────────────────────────────────────────────
+     blur(24px) + white hairline is the premium "frosted instrument" read;
+     the signal tint only lives in the border + inner top highlight. */
+  .glass-panel {
+    background:
+      linear-gradient(160deg, rgba(14, 23, 38, 0.92) 0%, rgba(6, 10, 18, 0.94) 100%);
+    backdrop-filter: blur(24px) saturate(140%);
+    -webkit-backdrop-filter: blur(24px) saturate(140%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.07),
+      0 0 0 1px rgba(34, 200, 236, 0.05),
+      0 24px 60px -28px rgba(0, 0, 0, 0.95);
+  }
+
+  .glass-panel-hover {
+    transition:
+      transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+      border-color 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .glass-panel-hover:hover {
+    transform: translateY(-6px);
+    border-color: rgba(34, 200, 236, 0.5);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      0 0 0 1px rgba(34, 200, 236, 0.18),
+      0 0 24px -4px rgba(34, 200, 236, 0.35),
+      0 34px 80px -30px rgba(34, 200, 236, 0.4);
+  }
+
+  /* ── Light sweep on hover (opt-in) ──────────────────────────────────────
+     A specular band that crosses the surface once on hover. */
+  .sheen {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .sheen::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -65%;
+    width: 42%;
+    z-index: 3;
+    pointer-events: none;
+    background: linear-gradient(
+      100deg,
+      transparent 0%,
+      rgba(168, 236, 253, 0.09) 38%,
+      rgba(255, 255, 255, 0.17) 50%,
+      rgba(168, 236, 253, 0.09) 62%,
+      transparent 100%
+    );
+    transform: skewX(-16deg);
+    opacity: 0;
+  }
+
+  .sheen:hover::before {
+    animation-name: sheenSweep;
+    animation-duration: 0.95s;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+    animation-fill-mode: both;
+    animation-iteration-count: 1;
+  }
+
+  /* ── Electric glow ──────────────────────────────────────────────────────
+     A tight bright core plus a wide soft halo reads as "powered", where a
+     single large blur just looks like a smudge. */
+  .glow-signal {
+    filter:
+      drop-shadow(0 0 10px rgba(34, 200, 236, 0.5))
+      drop-shadow(0 0 34px rgba(34, 200, 236, 0.22));
+  }
+
+  .glow-signal-soft {
+    filter:
+      drop-shadow(0 0 8px rgba(34, 200, 236, 0.32))
+      drop-shadow(0 0 26px rgba(34, 200, 236, 0.14));
+  }
+
+  /* Additive bloom over the dark substrate — the "signal overdriving" look. */
+  .bloom-dodge {
+    mix-blend-mode: color-dodge;
+  }
+
+  .bloom-overlay {
+    mix-blend-mode: overlay;
+  }
+
+  /* ── Hairline / edge ─────────────────────────────────────────────────── */
+  .edge-hairline {
+    border-color: rgba(34, 200, 236, 0.16);
+  }
+
+  /* ── Buttons ─────────────────────────────────────────────────────────────
+     14px / 700 / wide tracking / pill — matches the reference's CTA weight
+     so primary actions carry the same visual authority. */
+  .btn-primary {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 0.95rem 2rem;
+    border-radius: 9999px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.875rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #04121a;
+    background: linear-gradient(120deg, #5fdcf8 0%, #22c8ec 45%, #5b8dfb 100%);
+    box-shadow:
+      0 0 0 1px rgba(95, 220, 248, 0.4),
+      0 0 24px -4px rgba(34, 200, 236, 0.5),
+      0 14px 40px -16px rgba(34, 200, 236, 0.55);
+    overflow: hidden;
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.15s ease,
+      filter 0.15s ease;
+  }
+
+  .btn-primary::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.45),
+      transparent
+    );
+    transform: translateX(-130%) skewX(-18deg);
+    transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+  }
+
+  .btn-primary:hover {
+    filter: brightness(1.08);
+    transform: translateY(-2px);
+    box-shadow:
+      0 0 0 1px rgba(95, 220, 248, 0.65),
+      0 0 34px -2px rgba(34, 200, 236, 0.65),
+      0 20px 60px -18px rgba(34, 200, 236, 0.75);
+  }
+
+  .btn-primary:hover::after {
+    transform: translateX(130%) skewX(-18deg);
+  }
+
+  .btn-ghost {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 0.95rem 2rem;
+    border-radius: 9999px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.875rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #d7f7ff;
+    background: rgba(10, 12, 16, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    transition:
+      transform 0.15s ease,
+      border-color 0.15s ease,
+      color 0.15s ease,
+      background-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+
+  .btn-ghost:hover {
+    color: #ffffff;
+    transform: translateY(-2px);
+    border-color: rgba(34, 200, 236, 0.65);
+    background: rgba(34, 200, 236, 0.1);
+    box-shadow: 0 0 30px -6px rgba(34, 200, 236, 0.55);
+  }
+
+  /* ── Typography helpers ──────────────────────────────────────────────────
+     Two display tiers:
+       .poster-word  → condensed poster face, for the giant hero lockup
+       .display-mask → heavy sans with a gradient clipped across the whole
+                       heading (the signature section-title treatment) */
+  .poster-word {
+    font-family: var(--font-poster);
+    font-weight: 400;
+    line-height: 0.82;
+    letter-spacing: 0.045em;
+    text-transform: uppercase;
+  }
+
+  .display-mask {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(2.25rem, 5.6vw, 4.5rem);
+    line-height: 0.94;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    background-image: linear-gradient(
+      135deg,
+      #ffffff 0%,
+      #d7f7ff 26%,
+      #5fdcf8 60%,
+      #9d7cf7 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .text-signal-glow {
+    text-shadow:
+      0 0 18px rgba(34, 200, 236, 0.4),
+      0 0 46px rgba(34, 200, 236, 0.2);
+  }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--color-signal-300);
+  }
+
+  .mono-label {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  /* ── Signal gradient fills ───────────────────────────────────────────── */
+  .bg-signal-gradient {
+    background-image: linear-gradient(
+      120deg,
+      #5fdcf8 0%,
+      #22c8ec 40%,
+      #5b8dfb 72%,
+      #9d7cf7 100%
+    );
+  }
+
+  .signal-gradient-text {
+    background-image: linear-gradient(120deg, #d7f7ff 0%, #22c8ec 45%, #9d7cf7 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Backwards-compatible aliases (legacy `gold-*` class names in the codebase
+     were never defined in CSS — mapping them here guarantees nothing renders
+     as an invisible/transparent button again). */
+  .bg-gold-gradient {
+    background-image: linear-gradient(
+      120deg,
+      #5fdcf8 0%,
+      #22c8ec 40%,
+      #5b8dfb 72%,
+      #9d7cf7 100%
+    );
+  }
+
+  .gold-gradient-text {
+    background-image: linear-gradient(120deg, #d7f7ff 0%, #22c8ec 45%, #9d7cf7 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* ── Circuit decorations ────────────────────────────────────────────── */
+  .circuit-corner {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-color: rgba(34, 200, 236, 0.5);
+    pointer-events: none;
+  }
+
+  .traces-faint {
+    background-image:
+      linear-gradient(rgba(34, 200, 236, 0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(34, 200, 236, 0.045) 1px, transparent 1px);
+    background-size: 46px 46px;
+  }
+
+  .traces-fine {
+    background-image:
+      linear-gradient(rgba(34, 200, 236, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(34, 200, 236, 0.03) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+
+  /* Animated marching ants along a trace */
+  .trace-flow {
+    stroke-dasharray: 6 12;
+    animation: traceFlow 1.6s linear infinite;
+  }
+
+  /* ── Status chips ───────────────────────────────────────────────────── */
+  .chip-technical {
+    background: rgba(34, 200, 236, 0.1);
+    border: 1px solid rgba(34, 200, 236, 0.32);
+    color: var(--color-signal-200);
+  }
+
+  .chip-special {
+    background: rgba(157, 124, 247, 0.1);
+    border: 1px solid rgba(157, 124, 247, 0.32);
+    color: var(--color-plasma-300);
+  }
+
+  .chip-nontechnical {
+    background: rgba(91, 141, 251, 0.1);
+    border: 1px solid rgba(91, 141, 251, 0.32);
+    color: var(--color-ion-300);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   KEYFRAMES
+   ══════════════════════════════════════════════════════════════════════════ */
+
+@keyframes traceFlow {
+  to {
+    stroke-dashoffset: -36;
+  }
+}
+
+/* A pulse of light travelling left → right along a bus.
+   The travelling element is 24% wide, so translateX(-100%) → translateX(416%)
+   sweeps its centre from -12% to ~112% of the track. */
+@keyframes busSweep {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(416%);
+    opacity: 0;
+  }
+}
+
+/* Nodes ignite as the sweep reaches them (staggered per index) */
+@keyframes nodeIgnite {
+  0%,
+  62%,
+  100% {
+    opacity: 0.28;
+    box-shadow: 0 0 0 rgba(34, 200, 236, 0);
+  }
+  72%,
+  80% {
+    opacity: 1;
+    box-shadow: 0 0 14px rgba(34, 200, 236, 0.9);
+  }
+}
+
+/* Vertical counterpart for the timeline spine.
+   Travelling element is 18% tall → translateY(-120%) → translateY(660%) covers
+   the full track with a little bleed at both ends. */
+@keyframes spineSweep {
+  0% {
+    transform: translateY(-120%);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(660%);
+    opacity: 0;
+  }
+}
+
+@keyframes scanSweep {
+  0% {
+    transform: translateY(-120%);
+    opacity: 0;
+  }
+  8% {
+    opacity: 0.55;
+  }
+  92% {
+    opacity: 0.55;
+  }
+  100% {
+    transform: translateY(120%);
+    opacity: 0;
+  }
+}
+
+@keyframes gridDrift {
+  to {
+    background-position:
+      46px 46px,
+      46px 46px;
+  }
+}
+
+@keyframes ambientGlow {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes floatGentle {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes flipIn {
+  0% {
+    opacity: 0;
+    transform: perspective(700px) rotateX(-42deg) translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: perspective(700px) rotateX(0) translateY(0);
+  }
+}
+
+@keyframes nodeBlink {
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+@keyframes marqueeScroll {
+  0% {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes marqueeScrollReverse {
+  0% {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes borderPulseCyan {
+  0%,
+  100% {
+    border-color: rgba(34, 200, 236, 0.18);
+    box-shadow: 0 0 10px rgba(34, 200, 236, 0.08);
+  }
+  50% {
+    border-color: rgba(34, 200, 236, 0.5);
+    box-shadow: 0 0 26px rgba(34, 200, 236, 0.22);
+  }
+}
+
+@keyframes waveDash {
+  to {
+    stroke-dashoffset: -260;
+  }
+}
+
+@keyframes eqBar {
+  0%,
+  100% {
+    transform: scaleY(0.28);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+/* Specular band crossing a surface on hover. */
+@keyframes sheenSweep {
+  0% {
+    left: -65%;
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  100% {
+    left: 120%;
+    opacity: 0;
+  }
+}
+
+/* Slow additive bloom breathing behind hero / section focal points. */
+@keyframes bloomBreath {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.75;
+    transform: scale(1.12);
+  }
+}
+
+/* Radar-style ring that expands and fades — used on the hero instrument. */
+@keyframes radarRing {
+  0% {
+    transform: scale(0.35);
+    opacity: 0.55;
+  }
+  100% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+
+/* Continuous slow rotation for instrument bezels. */
+@keyframes spinSlow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spinReverse {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+/* Vertical scan bar travelling down a framed panel. */
+@keyframes scanBarDown {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   UTILITIES
+   ══════════════════════════════════════════════════════════════════════════ */
+
+@layer utilities {
+  .animate-trace-flow {
+    animation: traceFlow 1.6s linear infinite;
+  }
+
+  .animate-bus-sweep {
+    animation: busSweep 4.5s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  }
+
+  .animate-node-ignite {
+    animation: nodeIgnite 4.5s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  }
+
+  .animate-spine-sweep {
+    animation: spineSweep 6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  }
+
+  .animate-scan-sweep {
+    animation: scanSweep 7s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  }
+
+  .animate-grid-drift {
+    animation: gridDrift 24s linear infinite;
+  }
+
+  .animate-ambient {
+    animation: ambientGlow 9s ease-in-out infinite;
+  }
+
+  .animate-float-gentle {
+    animation: floatGentle 6s ease-in-out infinite;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .animate-flip-in {
+    animation: flipIn 0.45s cubic-bezier(0.23, 1, 0.32, 1) both;
+  }
+
+  .animate-node-blink {
+    animation: nodeBlink 2.6s ease-in-out infinite;
+  }
+
+  .animate-border-pulse {
+    animation: borderPulseCyan 3.4s ease-in-out infinite;
+  }
+
+  .animate-wave-dash {
+    animation: waveDash 3.2s linear infinite;
+  }
+
+  .animate-marquee {
+    display: flex;
+    width: max-content;
+    animation: marqueeScroll 38s linear infinite;
+  }
+  .animate-marquee:hover {
+    animation-play-state: paused;
+  }
+
+  .animate-marquee-reverse {
+    animation-name: marqueeScrollReverse;
+  }
+
+  .animate-bloom {
+    animation: bloomBreath 7s ease-in-out infinite;
+  }
+
+  .animate-radar {
+    animation: radarRing 3.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  }
+
+  .animate-spin-slow {
+    animation: spinSlow 26s linear infinite;
+  }
+
+  .animate-spin-reverse {
+    animation: spinReverse 34s linear infinite;
+  }
+
+  .animate-scan-bar {
+    animation: scanBarDown 5.5s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  }
+
+  /* ── Fixed navbar scrim: opaque at the bar, fading to nothing at the edge,
+     so the header sits on the page instead of boxing it in. ─────────────── */
+  .nav-scrim {
+    background-image: linear-gradient(
+      to bottom,
+      rgba(4, 6, 12, 0.95) 0%,
+      rgba(4, 6, 12, 0.82) 45%,
+      rgba(4, 6, 12, 0.35) 80%,
+      rgba(4, 6, 12, 0) 100%
+    );
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* ── Respect reduced-motion: freeze every decorative animation ───────────── */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
