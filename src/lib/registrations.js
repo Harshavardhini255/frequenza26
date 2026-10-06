@@ -30,6 +30,47 @@ function trimStoredScreenshot(reg) {
   }));
 }
 
+/* Every localStorage write for the registration cache goes through here. The
+   cache is only a light mirror — the authoritative copy lives in Supabase.
+   Base64 payment screenshots fetched back from the DB are big (hundreds of
+   KB each), so if they land in localStorage the single key blows the ~5MB
+   browser quota and `setItem` throws, which used to break registration
+   submission. We always trim screenshots, then fall back to progressively
+   smaller shapes if a device still reports QuotaExceededError, and never
+   throw back to the caller. */
+function persistLocal(records) {
+  const attempts = [
+    () => JSON.stringify(trimStoredScreenshot(records)),
+    () =>
+      JSON.stringify(
+        records.map((r) =>
+          r.payment ? { ...r, payment: { ...r.payment, screenshot_path: "" } } : r,
+        ),
+      ),
+    () => JSON.stringify(records.map((r) => ({ ...r, payment: undefined }))),
+    () =>
+      JSON.stringify(
+        records.map((r) => ({ ...r, payment: undefined, events: undefined })),
+      ),
+  ];
+
+  for (const make of attempts) {
+    try {
+      localStorage.setItem(REGISTRATIONS_KEY, make());
+      return true;
+    } catch (err) {
+      const quotaExceeded =
+        (err && err.name === "QuotaExceededError") ||
+        (err && /quota/i.test(String(err.message || "")));
+      if (quotaExceeded) continue;
+      console.warn("LocalStorage cache write warning:", err);
+      return false;
+    }
+  }
+  console.warn("LocalStorage cache write warning: dataset too large to cache");
+  return false;
+}
+
 export const paymentService = {
   async uploadScreenshot(file, registrationNumber) {
     const ext = file.name.split(".").pop() || "png";
@@ -127,7 +168,7 @@ export const paymentService = {
           reg.payment.rejection_reason = undefined;
           reg.payment.verified_at = now;
         }
-        localStorage.setItem(REGISTRATIONS_KEY, JSON.stringify(all));
+        persistLocal(all);
         return (
           reg.payment || {
             id: paymentId,
@@ -207,7 +248,7 @@ export const paymentService = {
           reg.payment.payment_status = "rejected";
           reg.payment.rejection_reason = reason;
         }
-        localStorage.setItem(REGISTRATIONS_KEY, JSON.stringify(all));
+        persistLocal(all);
         return (
           reg.payment || {
             id: paymentId,
@@ -310,8 +351,14 @@ export const registrationService = {
     });
 
     const filtered = Array.from(merged.values()).filter((r) => !isBlocked(r));
-    if (local.length !== filtered.length) {
-      localStorage.setItem(REGISTRATIONS_KEY, JSON.stringify(filtered));
+    /* Re-write the cache when the set changed OR when the cached copy still
+       holds oversized screenshots (migrates a previously-bloated value down to
+       the light format instead of crashing on quota). */
+    const needsTrim = local.some(
+      (r) => r?.payment?.screenshot_path && r.payment.screenshot_path.length > 200,
+    );
+    if (local.length !== filtered.length || needsTrim) {
+      persistLocal(filtered);
     }
 
     return filtered.sort(
@@ -555,7 +602,7 @@ export const registrationService = {
           .filter((r) => r.registration_number !== registration.registration_number)
           .map((r) => r),
       ];
-      localStorage.setItem(REGISTRATIONS_KEY, JSON.stringify(trimStoredScreenshot(next)));
+      persistLocal(next);
     } catch (err) {
       console.warn("LocalStorage cache write warning (harmless):", err);
     }
@@ -618,7 +665,7 @@ export const registrationService = {
     };
 
     all[index] = updated;
-    localStorage.setItem(REGISTRATIONS_KEY, JSON.stringify(all));
+    persistLocal(all);
     return updated;
   },
 
@@ -644,7 +691,11 @@ export const registrationService = {
       if (!raw) return;
       try {
         const next = JSON.parse(raw).filter((r) => r.id !== id && r.registration_number !== id);
-        localStorage.setItem(key, JSON.stringify(next));
+        if (key === REGISTRATIONS_KEY) {
+          persistLocal(next);
+        } else {
+          localStorage.setItem(key, JSON.stringify(next));
+        }
       } catch {
         /* ignore malformed cache */
       }
