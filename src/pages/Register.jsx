@@ -20,7 +20,8 @@ import { eventService } from "@/lib/services";
 import { registrationSchema, validateScreenshotFile } from "@/lib/validation";
 import PageAtmosphere from "../components/PageAtmosphere";
 
-const FOOD_PREFERENCE_FORM_URL = "https://forms.gle/masJnLkb4c82jqxB6";
+const FOOD_PREFERENCE_FORM_URL =
+  "https://docs.google.com/forms/d/e/1FAIpQLSfhGeD2ZqnDCoTvijrlbCnVyxfGEO_w15CyGmrnibNTU7rIEA/viewform";
 
 export default function Register() {
   const navigate = useNavigate();
