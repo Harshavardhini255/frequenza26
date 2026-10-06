@@ -20,6 +20,8 @@ import { eventService } from "@/lib/services";
 import { registrationSchema, validateScreenshotFile } from "@/lib/validation";
 import PageAtmosphere from "../components/PageAtmosphere";
 
+const FOOD_PREFERENCE_FORM_URL = "https://forms.gle/masJnLkb4c82jqxB6";
+
 export default function Register() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -323,32 +325,46 @@ export default function Register() {
                       Food Preference *
                     </label>
                     <div className="grid grid-cols-2 gap-4">
-                      <label
-                        className={`p-3.5 rounded-xl border cursor-pointer transition-all flex items-center justify-center gap-3 ${watch("food_preference") === "Veg" ? "bg-green-500/20 border-green-400 text-white shadow-lg" : "bg-black/60 border-gold-500/30 text-slate-400 hover:border-gold-400"}`}
+                      <a
+                        href={FOOD_PREFERENCE_FORM_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex"
                       >
-                        <input
-                          type="radio"
-                          value="Veg"
-                          {...register("food_preference")}
-                          className="accent-green-400"
-                        />
-                        <span className="text-xs font-bold text-white flex items-center gap-1.5">
-                          🥗 Vegetarian (Veg)
-                        </span>
-                      </label>
-                      <label
-                        className={`p-3.5 rounded-xl border cursor-pointer transition-all flex items-center justify-center gap-3 ${watch("food_preference") === "Non-Veg" ? "bg-red-500/20 border-red-400 text-white shadow-lg" : "bg-black/60 border-gold-500/30 text-slate-400 hover:border-gold-400"}`}
+                        <label
+                          className={`w-full p-3.5 rounded-xl border cursor-pointer transition-all flex items-center justify-center gap-3 ${watch("food_preference") === "Veg" ? "bg-green-500/20 border-green-400 text-white shadow-lg" : "bg-black/60 border-gold-500/30 text-slate-400 hover:border-gold-400"}`}
+                        >
+                          <input
+                            type="radio"
+                            value="Veg"
+                            {...register("food_preference")}
+                            className="accent-green-400"
+                          />
+                          <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                            🥗 Vegetarian (Veg)
+                          </span>
+                        </label>
+                      </a>
+                      <a
+                        href={FOOD_PREFERENCE_FORM_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex"
                       >
-                        <input
-                          type="radio"
-                          value="Non-Veg"
-                          {...register("food_preference")}
-                          className="accent-red-400"
-                        />
-                        <span className="text-xs font-bold text-white flex items-center gap-1.5">
-                          🍕 Non-Vegetarian (Non-Veg)
-                        </span>
-                      </label>
+                        <label
+                          className={`w-full p-3.5 rounded-xl border cursor-pointer transition-all flex items-center justify-center gap-3 ${watch("food_preference") === "Non-Veg" ? "bg-red-500/20 border-red-400 text-white shadow-lg" : "bg-black/60 border-gold-500/30 text-slate-400 hover:border-gold-400"}`}
+                        >
+                          <input
+                            type="radio"
+                            value="Non-Veg"
+                            {...register("food_preference")}
+                            className="accent-red-400"
+                          />
+                          <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                            🍕 Non-Vegetarian (Non-Veg)
+                          </span>
+                        </label>
+                      </a>
                     </div>
                   </div>
                 </div>
