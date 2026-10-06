@@ -42,7 +42,9 @@ export default function EventCard({
   event,
   onViewDetails,
   onRegisterSelect,
-  showSeats = true,
+  /* Seat counts are never rendered on event cards — the `max_participants`
+     field is kept in the data/DB and can be re-enabled per call site. */
+  showSeats = false,
 }) {
   if (!event) return null;
 
