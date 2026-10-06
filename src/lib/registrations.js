@@ -399,16 +399,6 @@ export const registrationService = {
   },
 
   async submitRegistration(form) {
-    const existing = (await this.getAllRegistrations()).find(
-      (r) =>
-        r.email?.toLowerCase() === form.email.toLowerCase() || r.phone === form.phone,
-    );
-    if (existing) {
-      throw new Error(
-        `A registration already exists with email "${form.email}" or phone "${form.phone}". Registration ID: ${existing.registration_number}`,
-      );
-    }
-
     const now = new Date().toISOString();
     let registrationNumber = `FREQ26-${Math.floor(10000 + Math.random() * 90000)}`;
     const eventIds = [form.tech_event_id, form.non_tech_event_id].filter(Boolean);
