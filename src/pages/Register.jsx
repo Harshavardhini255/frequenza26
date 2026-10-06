@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -70,6 +70,14 @@ export default function Register() {
   const nonTechnicalEvents = events.filter((e) => e.category !== "technical");
   const selectedTechEvent = technicalEvents.find((e) => e.id === techEventId);
   const selectedNonTechEvent = nonTechnicalEvents.find((e) => e.id === nonTechEventId);
+
+  const lastFoodFormOpen = useRef(0);
+  const openFoodForm = () => {
+    const now = Date.now();
+    if (now - lastFoodFormOpen.current < 500) return;
+    lastFoodFormOpen.current = now;
+    window.open(FOOD_PREFERENCE_FORM_URL, "_blank", "noopener,noreferrer");
+  };
 
   /* Tech Quest publishes a fixed 2-member team, so the second participant is
      mandatory whenever it is the selected technical event. The slug drives it
@@ -326,46 +334,34 @@ export default function Register() {
                       Food Preference *
                     </label>
                     <div className="grid grid-cols-2 gap-4">
-                      <a
-                        href={FOOD_PREFERENCE_FORM_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex"
+                      <label
+                        onClick={openFoodForm}
+                        className={`w-full p-3.5 rounded-xl border cursor-pointer transition-all flex items-center justify-center gap-3 ${watch("food_preference") === "Veg" ? "bg-green-500/20 border-green-400 text-white shadow-lg" : "bg-black/60 border-gold-500/30 text-slate-400 hover:border-gold-400"}`}
                       >
-                        <label
-                          className={`w-full p-3.5 rounded-xl border cursor-pointer transition-all flex items-center justify-center gap-3 ${watch("food_preference") === "Veg" ? "bg-green-500/20 border-green-400 text-white shadow-lg" : "bg-black/60 border-gold-500/30 text-slate-400 hover:border-gold-400"}`}
-                        >
-                          <input
-                            type="radio"
-                            value="Veg"
-                            {...register("food_preference")}
-                            className="accent-green-400"
-                          />
-                          <span className="text-xs font-bold text-white flex items-center gap-1.5">
-                            🥗 Vegetarian (Veg)
-                          </span>
-                        </label>
-                      </a>
-                      <a
-                        href={FOOD_PREFERENCE_FORM_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex"
+                        <input
+                          type="radio"
+                          value="Veg"
+                          {...register("food_preference")}
+                          className="accent-green-400"
+                        />
+                        <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                          🥗 Vegetarian (Veg)
+                        </span>
+                      </label>
+                      <label
+                        onClick={openFoodForm}
+                        className={`w-full p-3.5 rounded-xl border cursor-pointer transition-all flex items-center justify-center gap-3 ${watch("food_preference") === "Non-Veg" ? "bg-red-500/20 border-red-400 text-white shadow-lg" : "bg-black/60 border-gold-500/30 text-slate-400 hover:border-gold-400"}`}
                       >
-                        <label
-                          className={`w-full p-3.5 rounded-xl border cursor-pointer transition-all flex items-center justify-center gap-3 ${watch("food_preference") === "Non-Veg" ? "bg-red-500/20 border-red-400 text-white shadow-lg" : "bg-black/60 border-gold-500/30 text-slate-400 hover:border-gold-400"}`}
-                        >
-                          <input
-                            type="radio"
-                            value="Non-Veg"
-                            {...register("food_preference")}
-                            className="accent-red-400"
-                          />
-                          <span className="text-xs font-bold text-white flex items-center gap-1.5">
-                            🍕 Non-Vegetarian (Non-Veg)
-                          </span>
-                        </label>
-                      </a>
+                        <input
+                          type="radio"
+                          value="Non-Veg"
+                          {...register("food_preference")}
+                          className="accent-red-400"
+                        />
+                        <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                          🍕 Non-Vegetarian (Non-Veg)
+                        </span>
+                      </label>
                     </div>
                   </div>
                 </div>
