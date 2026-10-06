@@ -291,8 +291,22 @@ export const registrationService = {
     local.forEach((r) => {
       if (r && r.registration_number) merged.set(r.registration_number, r);
     });
+    /* Values the remote row may not carry as columns yet (Food Preference,
+       teammate details) are read back from the cached record instead of being
+       wiped by the remote overwrite — the CSV export reads this merged list. */
+    const CACHED_ONLY_FIELDS = [
+      "food_preference",
+      "team_member_2_name",
+      "team_member_2_phone",
+    ];
     remote.forEach((r) => {
-      if (r && r.registration_number) merged.set(r.registration_number, r);
+      if (!r || !r.registration_number) return;
+      const cached = merged.get(r.registration_number) || {};
+      const carried = {};
+      CACHED_ONLY_FIELDS.forEach((key) => {
+        carried[key] = r[key] ?? cached[key] ?? "";
+      });
+      merged.set(r.registration_number, { ...r, ...carried });
     });
 
     const filtered = Array.from(merged.values()).filter((r) => !isBlocked(r));
@@ -479,8 +493,10 @@ export const registrationService = {
 
           remoteResult = {
             ...inserted,
-            /* Keep the team details in the local record even when a fallback
-               payload (without those columns) was what the table accepted. */
+            /* The `registrations` table may not carry these columns yet; keep
+               them on the local record so the admin CSV still exports the
+               value the participant actually selected. */
+            food_preference: form.food_preference || inserted.food_preference || "",
             team_member_2_name: form.team_member_2_name || "",
             team_member_2_phone: form.team_member_2_phone || "",
             payment: payment || {
