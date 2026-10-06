@@ -10,8 +10,9 @@ export const EVENTS = [
     max_participants: 100,
     registration_fee: 0,
     rules: [
-      "Each participant will compete individually.",
-      "Round 1: Preliminary written/online screening quiz containing 25 MCQs (Time limit: 25 minutes).",
+      "Team Size: 2 Members",
+      "Tech Quest is a 2-member team event. Individual participation is not allowed — every team must register exactly 2 participants.",
+      "Round 1: Preliminary written quiz containing 25 MCQs (Time limit: 25 minutes).",
       "Round 2: Rapid-Fire buzzer round for top 8 qualifying finalists.",
       "Use of mobile phones or smartwatches during quiz rounds will result in immediate disqualification.",
       "Judges decision will be final and binding.",

@@ -172,6 +172,7 @@ export default function Events() {
                   >
                     <EventCard
                       event={evt}
+                      showSeats={false}
                       onViewDetails={setSelectedEvent}
                       onRegisterSelect={(e) => navigate("/register", { state: { preselectedEventId: e.id } })}
                     />

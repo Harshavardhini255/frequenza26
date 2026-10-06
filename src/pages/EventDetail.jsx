@@ -183,7 +183,7 @@ export default function EventDetail() {
               )}
               {event.max_participants && (
                 <div className="glass-panel rounded-xl p-5">
-                  <div className="mono-label text-slate-500">Total slots</div>
+                  <div className="mono-label text-slate-500">Total seats</div>
                   <p className="mt-2 font-mono text-lg font-bold text-signal-200">
                     {event.max_participants} participants
                   </p>

@@ -49,13 +49,19 @@ export function teamSizeLabel(event) {
   const full = extractTeamSize(event);
   if (!full) return null;
 
-  const individuals = /compete\s+individually|individual\s+participation/i.test(full);
+  /* "Individual" only counts when the sentence really permits solo entry —
+     Tech Quest states that individual participation "is not allowed". */
+  const individuals =
+    /compete\s+individually|individual\s+participation/i.test(full) &&
+    !/individual\s+participation\s+is\s+not\s+allowed/i.test(full);
 
   const range = full.match(/(\d+)\s*[–-]\s*(\d+)\s*(?:members|participants)/i);
   const minMax = full.match(/minimum:?\s*(\d+)[\s\S]*maximum:?\s*(\d+)/i);
-  const group = full.match(/group\s+of\s*(\d+)/i);
+  const group = full.match(/group\s+of\s+(\d+)/i);
   const upto = full.match(/up\s*(?:to)?\s*(\d+)/i);
   const exact = full.match(/(\d+)\s+members?\s+per\s+team/i);
+  /* "Team Size: 2 Members" — an exact, fixed-size team. */
+  const fixed = full.match(/team\s*size:?\s*(\d+)\s*(?:members?)?/i);
 
   let label = null;
   if (range) label = `${range[1]}–${range[2]} members`;
@@ -63,6 +69,7 @@ export function teamSizeLabel(event) {
   else if (group) label = `Group of ${group[1]}`;
   else if (upto) label = `Up to ${upto[1]} members`;
   else if (exact) label = `${exact[1]} members / team`;
+  else if (fixed) label = `${fixed[1]} member${fixed[1] === "1" ? "" : "s"}`;
 
   // Events that allow either solo or team entry must not hide the solo option.
   if (individuals) return label ? `Individual or ${label.toLowerCase()}` : "Individual";

@@ -42,7 +42,24 @@ export const adminService = {
       "Payment Status",
       "UPI Transaction ID",
       "Submitted Date",
+      "Food Preference",
+      "Team Member 2 Name",
+      "Team Member 2 Phone",
     ];
+
+    /* `food_preference` is validated as the enum "Veg" | "Non-Veg" at
+       registration time (lib/validation.js), so it is passed straight
+       through. Normalising only covers casing/whitespace drift from older
+       rows — it never invents a value, and an absent field stays blank. */
+    const foodPreference = (r) => {
+      const raw = r?.food_preference;
+      if (typeof raw !== "string") return "";
+      const v = raw.trim();
+      if (!v) return "";
+      if (/^veg$/i.test(v)) return "Veg";
+      if (/^non[-\s]?veg$/i.test(v)) return "Non-Veg";
+      return v;
+    };
 
     const rows = registrations.map((r) => [
       `"${r.registration_number}"`,
@@ -56,6 +73,9 @@ export const adminService = {
       `"${r.payment_status}"`,
       `"${r.payment?.transaction_id || ""}"`,
       `"${new Date(r.created_at).toLocaleDateString("en-IN")}"`,
+      `"${foodPreference(r)}"`,
+      `"${(r.team_member_2_name || "").replace(/"/g, '""')}"`,
+      `"${r.team_member_2_phone || ""}"`,
     ]);
 
     const csv =

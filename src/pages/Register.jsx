@@ -53,12 +53,35 @@ export default function Register() {
       food_preference: "Veg",
       tech_event_id: preselectedEventId || "",
       non_tech_event_id: "",
+      requires_teammate: false,
+      team_member_2_name: "",
+      team_member_2_phone: "",
       transaction_id: "",
     },
   });
 
   const techEventId = watch("tech_event_id");
   const nonTechEventId = watch("non_tech_event_id");
+
+  const technicalEvents = events.filter((e) => e.category === "technical");
+  const nonTechnicalEvents = events.filter((e) => e.category !== "technical");
+  const selectedTechEvent = technicalEvents.find((e) => e.id === techEventId);
+  const selectedNonTechEvent = nonTechnicalEvents.find((e) => e.id === nonTechEventId);
+
+  /* Tech Quest publishes a fixed 2-member team, so the second participant is
+     mandatory whenever it is the selected technical event. The slug drives it
+     so nothing else in the form has to know which event it is. */
+  const needsTeamMember =
+    selectedTechEvent?.slug === "tech-quest" ||
+    /tech\s*quest/i.test(selectedTechEvent?.name || "");
+
+  useEffect(() => {
+    setValue("requires_teammate", needsTeamMember);
+    if (!needsTeamMember) {
+      setValue("team_member_2_name", "");
+      setValue("team_member_2_phone", "");
+    }
+  }, [needsTeamMember, setValue]);
 
   useEffect(() => {
     eventService.getEvents().then((list) => {
@@ -76,9 +99,6 @@ export default function Register() {
     });
   }, [preselectedEventId, setValue]);
 
-  const technicalEvents = events.filter((e) => e.category === "technical");
-  const nonTechnicalEvents = events.filter((e) => e.category !== "technical");
-
   const handleNext = async () => {
     setSubmitError(null);
     if (step === 1) {
@@ -93,7 +113,11 @@ export default function Register() {
       ]);
       if (valid) setStep(2);
     } else if (step === 2) {
-      const valid = await trigger(["tech_event_id"]);
+      const valid = await trigger(
+        needsTeamMember
+          ? ["tech_event_id", "team_member_2_name", "team_member_2_phone"]
+          : ["tech_event_id"],
+      );
       if (valid) setStep(3);
     } else if (step === 3) {
       setStep(4);
@@ -137,9 +161,6 @@ export default function Register() {
       setSubmitting(false);
     }
   };
-
-  const selectedTechEvent = technicalEvents.find((e) => e.id === techEventId);
-  const selectedNonTechEvent = nonTechnicalEvents.find((e) => e.id === nonTechEventId);
 
   return (
     <div className="section-y relative min-h-screen bg-dark-bg px-4 text-slate-100">
@@ -383,6 +404,12 @@ export default function Register() {
                           <div className="text-[11px] text-gold-400 italic font-medium">
                             {event.tagline}
                           </div>
+                          {(event.slug === "tech-quest" ||
+                            /tech\s*quest/i.test(event.name || "")) && (
+                            <span className="mt-1.5 inline-block rounded border border-signal-400/40 bg-signal-400/10 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-signal-200">
+                              Team Size: 2 Members
+                            </span>
+                          )}
                         </div>
                       </label>
                     ))}
@@ -393,6 +420,59 @@ export default function Register() {
                     </p>
                   )}
                 </div>
+
+                {needsTeamMember && (
+                  <div className="p-4 rounded-2xl border border-signal-400/30 bg-signal-400/5">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="text-xs font-extrabold uppercase tracking-wider text-signal-200">
+                        Tech Quest Team Details
+                      </div>
+                      <span className="rounded border border-signal-400/40 bg-signal-400/10 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-signal-200">
+                        Team Size: 2 Members
+                      </span>
+                    </div>
+                    <p className="mt-2 text-[11px] leading-relaxed text-slate-300">
+                      Tech Quest is a <strong className="text-white">2-member team event</strong>.
+                      You are participant <strong className="text-white">1</strong> — add your
+                      second team member below. Individual participation is not allowed.
+                    </p>
+
+                    <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <div>
+                        <label className="block text-xs font-bold text-signal-300 mb-1.5">
+                          Team Member 2 — Full Name *
+                        </label>
+                        <input
+                          type="text"
+                          {...register("team_member_2_name")}
+                          placeholder="e.g. Priya S"
+                          className="w-full px-4 py-3 rounded-xl bg-black/60 border border-signal-400/30 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-signal-400"
+                        />
+                        {errors.team_member_2_name && (
+                          <p className="text-[11px] text-red-400 mt-1">
+                            {String(errors.team_member_2_name.message)}
+                          </p>
+                        )}
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-signal-300 mb-1.5">
+                          Team Member 2 — Phone (10-digit Mobile) *
+                        </label>
+                        <input
+                          type="tel"
+                          {...register("team_member_2_phone")}
+                          placeholder="9876543210"
+                          className="w-full px-4 py-3 rounded-xl bg-black/60 border border-signal-400/30 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-signal-400"
+                        />
+                        {errors.team_member_2_phone && (
+                          <p className="text-[11px] text-red-400 mt-1">
+                            {String(errors.team_member_2_phone.message)}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 <div className="pt-4 border-t border-gold-500/20">
                   <label className="block text-xs font-extrabold text-blue-400 mb-2 uppercase tracking-wider">
@@ -477,6 +557,14 @@ export default function Register() {
                     Compulsory Tech Event:{" "}
                     <strong className="text-gold-300">{selectedTechEvent?.name}</strong>
                   </div>
+                  {needsTeamMember && (
+                    <div>
+                      Team Member 2 (Team Size: 2 Members):{" "}
+                      <strong className="text-signal-200">
+                        {watch("team_member_2_name")} ({watch("team_member_2_phone")})
+                      </strong>
+                    </div>
+                  )}
                   {selectedNonTechEvent && (
                     <div>
                       Optional Event:{" "}

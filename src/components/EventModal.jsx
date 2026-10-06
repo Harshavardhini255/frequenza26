@@ -130,7 +130,7 @@ export default function EventModal({ event, onClose, onRegisterSelect }) {
                   )}
                   {event.max_participants ? (
                     <div className="rounded-xl border border-signal-400/15 bg-void/50 p-4">
-                      <div className="mono-label text-slate-500">Total slots</div>
+                      <div className="mono-label text-slate-500">Total seats</div>
                       <div className="mt-1.5 font-mono text-sm font-semibold text-signal-200">
                         {event.max_participants} participants
                       </div>

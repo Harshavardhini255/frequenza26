@@ -75,6 +75,14 @@ export default function RegistrationSuccess() {
                   : "🍕 Non-Vegetarian (Non-Veg)"}
               </strong>
             </div>
+            {registration.team_member_2_name && (
+              <div>
+                Team Member 2:{" "}
+                <strong className="text-signal-200">
+                  {registration.team_member_2_name} ({registration.team_member_2_phone})
+                </strong>
+              </div>
+            )}
             <div>
               Registered Events:
               <ul className="mt-1 space-y-1 pl-3 list-disc text-gold-300 font-semibold">

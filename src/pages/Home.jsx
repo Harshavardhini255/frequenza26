@@ -623,7 +623,7 @@ export default function Home() {
               </span>
 
               <h2 className="display-mask mx-auto mt-6 max-w-3xl text-3xl text-white sm:text-5xl">
-                Lock your slot at <span className="signal-gradient-text">FREQUENZA '26</span>
+                Register for <span className="signal-gradient-text">FREQUENZA '26</span>
               </h2>
 
               <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-slate-300">

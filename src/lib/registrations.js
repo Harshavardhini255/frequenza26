@@ -386,6 +386,8 @@ export const registrationService = {
           department: form.department,
           year_of_study: form.year_of_study,
           food_preference: form.food_preference,
+          team_member_2_name: form.team_member_2_name || null,
+          team_member_2_phone: form.team_member_2_phone || null,
           registration_status: "pending_verification",
           payment_status: "under_review",
         };
@@ -395,36 +397,52 @@ export const registrationService = {
         insertError = first.error;
 
         if (insertError) {
-          const { food_preference, ...withoutFood } = payload;
-          const second = await supabase
-            .from("registrations")
-            .insert([withoutFood])
-            .select()
-            .single();
-          if (!second.error && second.data) {
-            inserted = second.data;
-            insertError = null;
-          } else {
-            const third = await supabase
+          /* Column-set resilience: retry with successively smaller payloads so
+             an optional column (team member / food preference) missing from the
+             table never blocks a registration from being stored. */
+          const withoutTeam = { ...payload };
+          delete withoutTeam.team_member_2_name;
+          delete withoutTeam.team_member_2_phone;
+
+          const withoutOptional = { ...withoutTeam };
+          delete withoutOptional.food_preference;
+
+          const attempts = [withoutTeam, withoutOptional];
+          for (const candidate of attempts) {
+            const retry = await supabase
               .from("registrations")
-              .insert([
-                {
-                  registration_id: registrationNumber,
-                  name: form.full_name,
-                  email: form.email,
-                  phone: form.phone,
-                  college_name: form.college_name,
-                  department: form.department,
-                  year_of_study: form.year_of_study,
-                  registration_status: "pending_verification",
-                  payment_status: "under_review",
-                },
-              ])
+              .insert([candidate])
               .select()
               .single();
-            inserted = third.data;
-            insertError = third.error;
+            if (!retry.error && retry.data) {
+              inserted = retry.data;
+              insertError = null;
+              break;
+            }
           }
+        }
+
+        if (insertError) {
+          /* Last resort: legacy column shape (`registration_id` / `name`). */
+          const legacy = await supabase
+            .from("registrations")
+            .insert([
+              {
+                registration_id: registrationNumber,
+                name: form.full_name,
+                email: form.email,
+                phone: form.phone,
+                college_name: form.college_name,
+                department: form.department,
+                year_of_study: form.year_of_study,
+                registration_status: "pending_verification",
+                payment_status: "under_review",
+              },
+            ])
+            .select()
+            .single();
+          inserted = legacy.data;
+          insertError = legacy.error;
         }
 
         if (insertError) {
@@ -461,6 +479,10 @@ export const registrationService = {
 
           remoteResult = {
             ...inserted,
+            /* Keep the team details in the local record even when a fallback
+               payload (without those columns) was what the table accepted. */
+            team_member_2_name: form.team_member_2_name || "",
+            team_member_2_phone: form.team_member_2_phone || "",
             payment: payment || {
               id: `pay-${Date.now()}`,
               registration_id: inserted.id,
@@ -490,6 +512,8 @@ export const registrationService = {
         department: form.department,
         year_of_study: form.year_of_study,
         food_preference: form.food_preference,
+        team_member_2_name: form.team_member_2_name || "",
+        team_member_2_phone: form.team_member_2_phone || "",
         registration_status: "pending_verification",
         payment_status: "under_review",
         created_at: now,

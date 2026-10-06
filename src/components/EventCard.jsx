@@ -38,7 +38,12 @@ const ICON_TONE = {
   special: "text-plasma-300",
 };
 
-export default function EventCard({ event, onViewDetails, onRegisterSelect }) {
+export default function EventCard({
+  event,
+  onViewDetails,
+  onRegisterSelect,
+  showSeats = true,
+}) {
   if (!event) return null;
 
   const category = eventCategory(event);
@@ -123,26 +128,29 @@ export default function EventCard({ event, onViewDetails, onRegisterSelect }) {
           {event.description}
         </p>
 
-        {/* meta strip */}
-        <dl className="mt-5 grid grid-cols-2 gap-3 border-t border-white/6 pt-4">
-          {team && (
-            <div>
-              <dt className="mono-label flex items-center gap-1.5 text-slate-500">
-                <Users className="h-3 w-3" />
-                Team
-              </dt>
-              <dd className="mt-1 text-[11px] font-medium text-slate-200">{team}</dd>
-            </div>
-          )}
-          {event.max_participants ? (
-            <div className={team ? "" : "col-span-2"}>
-              <dt className="mono-label text-slate-500">Slots</dt>
-              <dd className="mt-1 font-mono text-[11px] font-medium text-slate-200">
-                {event.max_participants} participants
-              </dd>
-            </div>
-          ) : null}
-        </dl>
+        {/* meta strip — seat count is hidden where the caller opts out
+            (All Events list) while the rest of the card stays unchanged */}
+        {(team || (showSeats && event.max_participants)) && (
+          <dl className="mt-5 grid grid-cols-2 gap-3 border-t border-white/6 pt-4">
+            {team && (
+              <div className={showSeats && event.max_participants ? "" : "col-span-2"}>
+                <dt className="mono-label flex items-center gap-1.5 text-slate-500">
+                  <Users className="h-3 w-3" />
+                  Team
+                </dt>
+                <dd className="mt-1 text-[11px] font-medium text-slate-200">{team}</dd>
+              </div>
+            )}
+            {showSeats && event.max_participants ? (
+              <div className={team ? "" : "col-span-2"}>
+                <dt className="mono-label text-slate-500">Seats</dt>
+                <dd className="mt-1 font-mono text-[11px] font-medium text-slate-200">
+                  {event.max_participants} participants
+                </dd>
+              </div>
+            ) : null}
+          </dl>
+        )}
 
         {event.coordinator_name && (
           <div className="mt-4 flex items-center gap-2 border-t border-white/6 pt-4 text-[11px] text-slate-400">
